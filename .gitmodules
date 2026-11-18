@@ -1,0 +1,3 @@
+[submodule "deps/matlib"]
+	path = deps/matlib
+	url = https://github.com/WillEdgington/matlib.git
