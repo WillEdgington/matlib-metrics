@@ -1,0 +1,7 @@
+# Build Artefacts
+*.o
+*.d
+*.a
+
+# Dependency/Environment folders
+venv/
