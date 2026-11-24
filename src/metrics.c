@@ -1,4 +1,5 @@
 #include "metrics.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -72,16 +73,34 @@ MetricsResult metrics_run(const MetricsConfig *cfg, metrics_bench_fn fn,
   return res;
 }
 
+static bool is_markdown_mode(void) {
+  const char *val = getenv("METRICS_MD");
+  return val != NULL && val[0] == '1';
+}
+
 void metrics_print_header(void) {
-  printf("%-28s | %10s | %10s | %10s | %10s | %10s | %10s\n", "Benchmark",
-         "Min (ms)", "Med (ms)", "Mean (ms)", "GFLOP/s", "GB/s", "FLOP/B");
-  printf("-----------------------------+------------+------------+------------+"
-         "------------+------------+------------\n");
+  if (is_markdown_mode()) {
+    printf("|%s|%s|%s|%s|%s|%s|%s|\n", "Benchmark", "Min (ms)", "Med (ms)",
+           "Mean (ms)", "GFLOP/s", "GB/s", "FLOP/B");
+    printf("|---|---|---|---|---|---|---|\n");
+  } else {
+    printf("%-28s | %10s | %10s | %10s | %10s | %10s | %10s\n", "Benchmark",
+           "Min (ms)", "Med (ms)", "Mean (ms)", "GFLOP/s", "GB/s", "FLOP/B");
+    printf(
+        "-----------------------------+------------+------------+------------+"
+        "------------+------------+------------\n");
+  }
 }
 
 void metrics_print_result(const MetricsResult *res) {
-  printf("%-28s | %10.4f | %10.4f | %10.4f | %10.2f | %10.2f | %10.2f\n",
-         res->name, res->min_sec * 1e3, res->median_sec * 1e3,
-         res->mean_sec * 1e3, res->gflops, res->gb_per_sec,
-         res->arithmetic_intensity);
+  if (is_markdown_mode()) {
+    printf("|%s|%.4f|%.4f|%.4f|%.2f|%.2f|%.2f|\n", res->name,
+           res->min_sec * 1e3, res->median_sec * 1e3, res->mean_sec * 1e3,
+           res->gflops, res->gb_per_sec, res->arithmetic_intensity);
+  } else {
+    printf("%-28s | %10.4f | %10.4f | %10.4f | %10.2f | %10.2f | %10.2f\n",
+           res->name, res->min_sec * 1e3, res->median_sec * 1e3,
+           res->mean_sec * 1e3, res->gflops, res->gb_per_sec,
+           res->arithmetic_intensity);
+  }
 }
